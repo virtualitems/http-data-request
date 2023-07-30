@@ -3,7 +3,12 @@
 ```javascript
 httpRequest(
     'https://jsonplaceholder.typicode.com/todos/1',
-  {},
+  {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+  },
   () => console.log('before send'),
   () => console.log('loading'),
   (response) => {
