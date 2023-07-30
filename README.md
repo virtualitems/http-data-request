@@ -10,7 +10,11 @@ httpRequest(
     console.log('response', response);
     return response.json();
   },
-  (data) => console.log('validation', data),
+  (data) => {
+    console.log('validation', data);
+    return data;
+  },
+  (data) => console.log('manipulation', data),
   (error) => console.log('error', error),
   (errorFound) => console.log('done', errorFound),
 );
