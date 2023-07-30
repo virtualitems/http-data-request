@@ -6,7 +6,7 @@ const httpRequest = function(fetchTarget, fetchOptions, handleBeforeSend, handle
 
   fetch(fetchTarget, fetchOptions)
     .then(fetchResponse => {
-      return handleResponse(fetchResponse);
+      return handleResponse(fetchResponse) || fetchResponse.text();
     })
     .then(fetchData => {
       handleValidation(fetchData);
