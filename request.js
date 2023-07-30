@@ -1,4 +1,4 @@
-const httpRequest = function(fetchTarget, fetchOptions, handleBeforeSend, handleLoading, handleResponse, handleError, handleDone) {
+const httpRequest = function(fetchTarget, fetchOptions, handleBeforeSend, handleLoading, handleResponse, handleValidation, handleError, handleDone) {
 
   handleBeforeSend();
 
@@ -6,7 +6,10 @@ const httpRequest = function(fetchTarget, fetchOptions, handleBeforeSend, handle
 
   fetch(fetchTarget, fetchOptions)
     .then(fetchResponse => {
-      handleResponse(fetchResponse);
+      return handleResponse(fetchResponse);
+    })
+    .then(fetchData => {
+      handleValidation(fetchData);
     })
     .catch(fetchError => {
       errorFound = true;
