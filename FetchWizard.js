@@ -1,73 +1,56 @@
-const FetchWizard = function(fetchTarget, fetchOptions) {
-
-  // Fetch
-  this.fetchTarget = fetchTarget;
-  this.fetchOptions = fetchOptions;
+const FetchWizard = function(fetchTarget, fetchOptions, callbacks) {
 
   // Callbacks
-  this.onInitializingCallback = null;
-  this.onLoadingCallback = null;
-  this.onResponseCallback = null;
-  this.onTransformCallback = null;
-  this.onDataCallback = null;
-  this.onDoneCallback = null;
+  const onInitializingCallback = typeof callbacks.onInitializing === 'function' ? callbacks.onInitializing : () => {};
+  const onRequestCallback = () => fetch(fetchTarget, fetchOptions);
+  const onLoadingCallback = typeof callbacks.onLoading === 'function' ? callbacks.onLoading : () => {};
+  const onResponseCallback = typeof callbacks.onResponse === 'function' ? callbacks.onResponse : response => response.arrayBuffer();
+  const onTransformCallback = typeof callbacks.onTransform === 'function' ? callbacks.onTransform : rawData => rawData;
+  const onDataCallback = typeof callbacks.onData === 'function' ? callbacks.onData : data => data;
+  const onDoneCallback = typeof callbacks.onDone === 'function' ? callbacks.onDone : () => {};
 
   // Promises
-  this.onInitializing = null;
-  this.onLoading = null;
-  this.onResponse = null;
-  this.onTransform = null;
-  this.onData = null;
-  this.onDone = null;
+  this.onInitializing = new Promise(resolve => resolve(onInitializingCallback()));
+
+  this.onRequest = this.onInitializing.then(onRequestCallback);
+
+  this.onLoading = this.onInitializing.then(onLoadingCallback);
+
+  this.onResponse = this.onRequest.then(onResponseCallback);
+
+  this.onTransform = this.onResponse.then(onTransformCallback);
+
+  this.onData = this.onTransform.then(onDataCallback);
+
+  this.onDone = this.onData.then(onDoneCallback);
 
 };
 
-FetchWizard.prototype.initializing = function(callback) {
-  this.onInitializingCallback = callback;
-  return this;
-};
 
-FetchWizard.prototype.loading = function(callback) {
-  this.onLoadingCallback = callback;
-  return this;
-};
+/// testing ///
 
-FetchWizard.prototype.response = function(callback) {
-  this.onResponseCallback = callback;
-  return this;
-};
+const fetchTarget = 'https://jsonplaceholder.typicode.com/todos/1';
+const fetchOptions = { method: 'GET', headers: { 'Accept': 'application/json' } };
 
-FetchWizard.prototype.transform = function(callback) {
-  this.onTransformCallback = callback;
-  return this;
-};
+const fwizard = new FetchWizard(fetchTarget, fetchOptions, {
+  onInitializing: () => console.log('initializing'),
+  onLoading: () => console.log('loading'),
+  onResponse: response => {
+    console.log('response', response);
+    return response.json();
+  },
+  onTransform: rawData => {
+    console.log('transform', rawData);
+    return rawData;
+  },
+  onData: data => console.log('data', data),
+  onDone: () => console.log('done'),
+});
 
-FetchWizard.prototype.data = function(callback) {
-  this.onDataCallback = callback;
-  return this;
-};
-
-FetchWizard.prototype.done = function(callback) {
-  this.onDoneCallback = callback;
-  return this;
-};
-
-FetchWizard.prototype.send = function() {
-
-  if (this.onInitializingCallback !== null)
-    this.onInitializingCallback();
-
-  const fetchPromise = fetch(this.fetchTarget, this.fetchOptions);
-
-  if (this.onLoadingCallback !== null)
-    this.onLoadingCallback();
-
-  this.onResponse = fetchPromise.then(this.onResponseCallback !== null ? this.onResponseCallback : response => response.arrayBuffer());
-
-  this.onTransform = this.onResponse.then(this.onTransformCallback !== null ? this.onTransformCallback : rawData => rawData);
-
-  this.onData = this.onTransform.then(this.onDataCallback !== null ? this.onDataCallback : data => data);
-
-  this.onDone = this.onData.then(this.onDoneCallback !== null ? this.onDoneCallback : () => {});
-
-};
+fwizard.onInitializing.then(() => console.log('1. onInitializing'));
+fwizard.onRequest.then(() => console.log('2. onRequest'));
+fwizard.onLoading.then(() => console.log('3. onLoading'));
+fwizard.onResponse.then(() => console.log('4. onResponse'));
+fwizard.onTransform.then(() => console.log('5. onTransform'));
+fwizard.onData.then(() => console.log('6. onData'));
+fwizard.onDone.then(() => console.log('7. onDone'));
