@@ -28,11 +28,6 @@ function xfetch(fetchTarget, fetchOptions) {
       greatResolve(data);
     });
 
-    // instructions after finishing
-    const onDone = onData.then(() => {
-      console.log('done');
-    });
-
     // if something goes wrong
     const handleError = error => {
       console.warn('error', error);
@@ -43,7 +38,6 @@ function xfetch(fetchTarget, fetchOptions) {
     onResponse.catch(handleError);
     onTransform.catch(handleError);
     onData.catch(handleError);
-    onDone.catch(handleError);
 
     // the fetch was sent
     console.log('loading');
@@ -64,5 +58,5 @@ const fetchOptions = {
 };
 
 xfetch(fetchTarget, fetchOptions)
-  .then(data => console.log('from outside: ', data))
-  .catch(error => console.warn('from outside: ', error));
+  .then(data => console.log('outside::done', data))
+  .catch(error => console.warn('outside::error', error));
