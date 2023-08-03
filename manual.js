@@ -58,5 +58,6 @@ const fetchOptions = {
 };
 
 xfetch(fetchTarget, fetchOptions)
+  // instructions after finishing
   .then(data => console.log('outside::done', data))
   .catch(error => console.warn('outside::error', error));
