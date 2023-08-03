@@ -70,6 +70,4 @@ FetchWizard.prototype.send = function() {
 
   this.onDone = this.onData.then(this.onDoneCallback !== null ? this.onDoneCallback : () => {});
 
-  // return this;
-
 };
