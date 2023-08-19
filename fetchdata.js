@@ -7,7 +7,7 @@
  * @param {Function} processOptions.onLoading
  * @returns {Promise}
  */
-const httpDataRequest = function(fetchTarget, fetchOptions=null, processOptions=null) {
+const fetchData = function(fetchTarget, fetchOptions=null, processOptions=null) {
 
   if (!fetchTarget)
     throw new Error('Target is not defined');
